@@ -1,28 +1,96 @@
 "use client"
 
+import * as React from "react"
 import Link from "next/link"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { averageRating } from "@/components/ui/model-ui/model-ui"
-import { Badge } from "@/components/ui/badge"
+import { averageRating, ModelLabel } from "@/components/ui/model-ui/model-ui"
 import { Skeleton } from "@/components/ui/skeleton"
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { type Model, tiers } from "@/lib/models"
 import { latestFromEachProvider } from "./latest-models"
 
+const SEASON_MONTHS = 3
+const seasonOptions = [1, 2, 4] as const
+
+function seasonsAgo(seasons: number) {
+  const date = new Date()
+  date.setMonth(date.getMonth() - seasons * SEASON_MONTHS)
+  return date.getTime()
+}
+
 export function LandingTierList({ models }: { models: Model[] }) {
-  const stats = useQuery(api.ratings.community)
+  const [rankingSeasons, setRankingSeasons] = React.useState(1)
+  const [releaseSeasons, setReleaseSeasons] = React.useState(1)
+  const [providerLimit, setProviderLimit] = React.useState(5)
+  const rankingSince = React.useMemo(
+    () => (rankingSeasons ? seasonsAgo(rankingSeasons) : undefined),
+    [rankingSeasons]
+  )
+  const releaseSince = React.useMemo(
+    () => (releaseSeasons ? Math.floor(seasonsAgo(releaseSeasons) / 1000) : undefined),
+    [releaseSeasons]
+  )
+  const stats = useQuery(api.ratings.seasonalCommunity, { since: rankingSince })
   const byId = new Map(stats?.map((entry) => [entry.modelId, entry]))
-  const rated = latestFromEachProvider(models).filter(
+  const rated = latestFromEachProvider(models, {
+    since: releaseSince,
+    limit: providerLimit,
+  }).filter(
     (model) => (byId.get(model.id)?.count ?? 0) > 0
   )
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <header className="mb-6">
-        <h1 className="text-xl font-semibold">Rankings</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Last 12 months · 5 latest models per provider
+      <section className="mb-8 w-full rounded-lg border bg-muted/20 p-5 sm:p-6">
+        <h2 className="text-lg font-semibold">Sign up to rate models</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          We&apos;d love to hear your takes.
         </p>
+      </section>
+      <header className="mb-6 space-y-4">
+        <div>
+          <h1 className="text-xl font-semibold">Rankings</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            One season is {SEASON_MONTHS} months. Date ranges end today.
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Filter label="Ranking freshness">
+            <NativeSelect
+              value={rankingSeasons}
+              onChange={(event) => setRankingSeasons(Number(event.target.value))}
+              aria-label="Ranking freshness"
+              className="w-full"
+            >
+              <SeasonOptions />
+            </NativeSelect>
+          </Filter>
+          <Filter label="Model release date">
+            <NativeSelect
+              value={releaseSeasons}
+              onChange={(event) => setReleaseSeasons(Number(event.target.value))}
+              aria-label="Model release date"
+              className="w-full"
+            >
+              <SeasonOptions />
+            </NativeSelect>
+          </Filter>
+          <Filter label="Latest per provider">
+            <NativeSelect
+              value={providerLimit}
+              onChange={(event) => setProviderLimit(Number(event.target.value))}
+              aria-label="Latest models per provider"
+              className="w-full"
+            >
+              {[1, 3, 5, 10].map((limit) => (
+                <NativeSelectOption key={limit} value={limit}>
+                  {limit} models
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+          </Filter>
+        </div>
       </header>
       <section
         aria-label="Community tier list"
@@ -58,12 +126,9 @@ export function LandingTierList({ models }: { models: Model[] }) {
                     <Link
                       key={model.id}
                       href={`/models/${encodeURIComponent(model.id)}`}
-                      className="flex max-w-full items-center gap-4 rounded-md border px-3 py-2 text-sm hover:bg-accent"
+                      className="flex max-w-full items-center rounded-md border px-3 py-2 text-sm hover:bg-accent"
                     >
-                      <span className="min-w-0 truncate">{model.name}</span>
-                      <Badge variant="secondary">
-                        {averageRating(byId.get(model.id)).toFixed(1)}
-                      </Badge>
+                      <ModelLabel model={model} />
                     </Link>
                   ))
                 ) : (
@@ -91,5 +156,27 @@ export function LandingTierList({ models }: { models: Model[] }) {
         </p>
       )}
     </main>
+  )
+}
+
+function Filter({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="grid gap-1.5 text-sm font-medium">
+      {label}
+      {children}
+    </label>
+  )
+}
+
+function SeasonOptions() {
+  return (
+    <>
+      {seasonOptions.map((seasons) => (
+        <NativeSelectOption key={seasons} value={seasons}>
+          {seasons === 1 ? "Current season" : `Last ${seasons} seasons`}
+        </NativeSelectOption>
+      ))}
+      <NativeSelectOption value={0}>All time</NativeSelectOption>
+    </>
   )
 }

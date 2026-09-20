@@ -5,11 +5,12 @@ import Link from "next/link"
 import { X } from "lucide-react"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { type Model } from "@/lib/models"
+import { isDefaultModel, isLanguageModel, type Model } from "@/lib/models"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { getRankings } from "@/lib/model-rankings"
+import { ModelLabel } from "@/components/ui/model-ui/model-ui"
 import styles from "./catalog.module.css"
 
 export function Catalog({
@@ -24,16 +25,25 @@ export function Catalog({
   const [provider, setProvider] = useState(initialProvider)
   const [capability, setCapability] = useState("")
   const [sort, setSort] = useState("rank")
+  const [scope, setScope] = useState("current")
   const rankings = getRankings(
     models.map((model) => model.id),
     stats
   )
-  const providers = [...new Set(models.map((model) => model.provider))].sort()
+  const scopedModels = models.filter((model) => {
+    if (!isLanguageModel(model) || model.variant !== "standard") return false
+    if (scope === "versions") return true
+    if (!model.canonical) return false
+    return scope === "legacy" || isDefaultModel(model)
+  })
+  const providers = [
+    ...new Set(scopedModels.map((model) => model.provider)),
+  ].sort()
   const capabilities = [
-    ...new Set(models.flatMap((model) => model.tags)),
+    ...new Set(scopedModels.flatMap((model) => model.tags)),
   ].sort()
   const query = search.trim().toLowerCase()
-  const entries = models
+  const entries = scopedModels
     .filter(
       (model) =>
         (!query ||
@@ -53,12 +63,15 @@ export function Catalog({
         a.name.localeCompare(b.name)
       )
     })
-  const filtered = Boolean(search || provider || capability)
+  const filtered = Boolean(
+    search || provider || capability || scope !== "current"
+  )
 
   function clearFilters() {
     setSearch("")
     setProvider("")
     setCapability("")
+    setScope("current")
   }
 
   return (
@@ -114,13 +127,32 @@ export function Catalog({
               <NativeSelectOption value="name">Name A–Z</NativeSelectOption>
             </NativeSelect>
           </label>
+          <label>
+            Scope
+            <NativeSelect
+              value={scope}
+              onChange={(event) => setScope(event.target.value)}
+            >
+              <NativeSelectOption value="current">
+                Current models
+              </NativeSelectOption>
+              <NativeSelectOption value="legacy">
+                Include legacy
+              </NativeSelectOption>
+              <NativeSelectOption value="versions">
+                All LLM versions
+              </NativeSelectOption>
+            </NativeSelect>
+          </label>
         </div>
       </section>
 
       <div className={styles.resultsHeading}>
         <p role="status">
           <strong>{entries.length.toLocaleString()}</strong>{" "}
-          {filtered ? `of ${models.length.toLocaleString()} models` : "models"}
+          {filtered
+            ? `of ${scopedModels.length.toLocaleString()} models`
+            : "models"}
         </p>
         {filtered ? (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
@@ -143,7 +175,7 @@ export function Catalog({
               className={styles.card}
             >
               <h2 className="min-w-0 truncate text-sm font-medium">
-                {model.name}
+                <ModelLabel model={model} />
               </h2>
               <span
                 className="shrink-0 text-xs text-muted-foreground tabular-nums"

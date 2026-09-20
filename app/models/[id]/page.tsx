@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { getModels } from "@/lib/openrouter"
+import { getAllModels, getModels } from "@/lib/openrouter"
 import { ModelDetail } from "@/components/ui/model-detail/model-detail"
 
 export default async function ModelPage({
@@ -14,8 +14,8 @@ export default async function ModelPage({
   } catch {
     notFound()
   }
-  const models = await getModels()
-  const model = models.find((entry) => entry.id === modelId)
+  const [allModels, models] = await Promise.all([getAllModels(), getModels()])
+  const model = allModels.find((entry) => entry.id === modelId)
   if (!model) notFound()
   return (
     <ModelDetail model={model} modelIds={models.map((entry) => entry.id)} />

@@ -5,9 +5,14 @@ import { useState } from "react"
 import { ArrowLeft, ArrowUpRight, Star } from "lucide-react"
 import { useConvexAuth, useMutation, useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { type Model, tiers } from "@/lib/models"
+import { modelDisplayName, type Model, tiers } from "@/lib/models"
 import { getRankings } from "@/lib/model-rankings"
-import { averageRating, StarRating } from "@/components/ui/model-ui/model-ui"
+import { labId } from "@/lib/labs"
+import {
+  averageRating,
+  ProviderIcon,
+  StarRating,
+} from "@/components/ui/model-ui/model-ui"
 import { AuthButton } from "@/components/ui/auth-button/auth-button"
 import {
   Dialog,
@@ -71,7 +76,10 @@ export function ModelDetail({
       </Link>
       <header className={styles.profileHeader}>
         <div>
-          <h1>{model.name}</h1>
+          <h1 className="flex items-center gap-3">
+            <ProviderIcon id={model.id} provider={model.provider} fallback={model.symbol} />
+            {modelDisplayName(model)}
+          </h1>
         </div>
       </header>
 
@@ -162,7 +170,19 @@ export function ModelDetail({
             <h2>Information</h2>
             <dl>
               <dt>Provider</dt>
-              <dd>{model.provider}</dd>
+              <dd>
+                <Link
+                  href={`/labs/${labId(model)}`}
+                  className="inline-flex items-center gap-2 hover:underline"
+                >
+                  <ProviderIcon
+                    id={model.id}
+                    provider={model.provider}
+                    fallback={model.symbol}
+                  />
+                  {model.provider}
+                </Link>
+              </dd>
               <dt>Family</dt>
               <dd>{model.family}</dd>
               <dt>Access</dt>
@@ -246,7 +266,9 @@ export function ModelDetail({
             <DialogTitle>
               {rating > 0 ? "Change rating" : "Add rating"}
             </DialogTitle>
-            <DialogDescription className="mt-2">{model.name}</DialogDescription>
+            <DialogDescription className="mt-2">
+              {modelDisplayName(model)}
+            </DialogDescription>
           </div>
           <div>
             <StarRating

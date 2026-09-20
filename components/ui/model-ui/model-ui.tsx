@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { type Model } from "@/lib/models"
+import { modelDisplayName, type Model } from "@/lib/models"
+import { getProviderIcon } from "@/lib/provider-icons"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 
 export type Stats = {
@@ -24,25 +25,29 @@ export function ProviderIcon({
   provider: string
   fallback?: string
 }) {
-  const providerId = id.split("/")[0].replace(/^~/, "")
+  const { icon, src } = getProviderIcon(id)
   return (
     <span
-      className="relative inline-flex size-[1em] items-center justify-center"
+      className="relative inline-flex size-[1.4em] shrink-0 items-center justify-center"
       title={provider}
     >
-      <span aria-hidden="true" className="text-[0.7em]">
-        {fallback}
-      </span>
-      {/* models.dev publishes monochrome provider marks for OpenRouter IDs. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`https://models.dev/logos/${encodeURIComponent(providerId)}.svg`}
-        alt={`${provider} logo`}
-        className="absolute inset-0 size-full object-contain opacity-90 invert"
-        onError={(event) => {
-          event.currentTarget.style.display = "none"
-        }}
-      />
+      {src ? (
+        // Curated local marks avoid runtime requests and layout changes.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
+          alt={`${provider} logo`}
+          className="size-full dark:invert"
+        />
+      ) : icon ? (
+        <svg viewBox="0 0 24 24" role="img" aria-label={`${provider} logo`}>
+          <path d={icon.path} fill="currentColor" />
+        </svg>
+      ) : (
+        <span aria-hidden="true" className="text-[0.7em]">
+          {fallback}
+        </span>
+      )}
     </span>
   )
 }
@@ -54,6 +59,25 @@ export function ModelIcon({ model }: { model: Model; small?: boolean }) {
       provider={model.provider}
       fallback={model.symbol}
     />
+  )
+}
+
+export function ModelLabel({
+  model,
+  className,
+}: {
+  model: Pick<Model, "id" | "name" | "provider" | "symbol">
+  className?: string
+}) {
+  return (
+    <span className={`inline-flex min-w-0 items-center gap-2 ${className ?? ""}`}>
+      <ProviderIcon
+        id={model.id}
+        provider={model.provider}
+        fallback={model.symbol}
+      />
+      <span className="min-w-0 truncate">{modelDisplayName(model)}</span>
+    </span>
   )
 }
 
@@ -70,9 +94,8 @@ export function ModelCard({ model, stats }: { model: Model; stats?: Stats }) {
   return (
     <article>
       <h3>
-        <ModelIcon model={model} />{" "}
         <Link href={`/models/${encodeURIComponent(model.id)}`}>
-          {model.name}
+          <ModelLabel model={model} />
         </Link>
       </h3>
       <p>{model.tags.join(", ")}</p>

@@ -1,5 +1,5 @@
 import { Catalog } from "@/components/ui/catalog/catalog"
-import { getModels } from "@/lib/openrouter"
+import { getAllModels } from "@/lib/openrouter"
 
 export default async function ModelsPage({
   searchParams,
@@ -7,7 +7,7 @@ export default async function ModelsPage({
   searchParams: Promise<{ provider?: string | string[] }>
 }) {
   const { provider } = await searchParams
-  const models = await getModels()
+  const models = await getAllModels()
   const initialProvider =
     typeof provider === "string" &&
     models.some((model) => model.provider === provider)
@@ -16,8 +16,6 @@ export default async function ModelsPage({
   return (
     <Catalog
       key={initialProvider}
-
-      
       models={models}
       initialProvider={initialProvider}
     />

@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useConvexAuth, useMutation, useQuery } from "convex/react"
-import { Check, GripVertical, Plus, Share2 } from "lucide-react"
+import { Check, Plus, Share2 } from "lucide-react"
 import { api } from "@/convex/_generated/api"
 import { authClient } from "@/lib/auth-client"
 import { type Model, tiers } from "@/lib/models"
-import { StarRating } from "@/components/ui/model-ui/model-ui"
+import { ModelLabel, StarRating } from "@/components/ui/model-ui/model-ui"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -72,6 +72,31 @@ function ProfileContent({
   const [editorModelId, setEditorModelId] = useState("")
   const [editorStars, setEditorStars] = useState<Exclude<Stars, null>>(3)
   const [editorNotes, setEditorNotes] = useState("")
+  const dirty = Object.keys(pending).length > 0
+
+  useEffect(() => {
+    if (!dirty) return
+
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = true
+    }
+    const warnBeforeNavigation = (event: MouseEvent) => {
+      const link = (event.target as Element | null)?.closest("a[href]")
+      if (!link || event.defaultPrevented) return
+      if (!window.confirm("You have unsaved changes. Are you sure you want to leave?")) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+    }
+
+    window.addEventListener("beforeunload", warnBeforeUnload)
+    document.addEventListener("click", warnBeforeNavigation, true)
+    return () => {
+      window.removeEventListener("beforeunload", warnBeforeUnload)
+      document.removeEventListener("click", warnBeforeNavigation, true)
+    }
+  }, [dirty])
 
   function move(modelId: string, stars: number) {
     if (!owner) return
@@ -156,7 +181,6 @@ function ProfileContent({
           .includes(search)
       )
     : unranked.slice(0, 12)
-  const dirty = Object.keys(pending).length > 0
   const editorSearch = editorQuery.trim().toLowerCase()
   const editorModels = models
     .filter(
@@ -193,63 +217,41 @@ function ProfileContent({
     setEditorOpen(false)
   }
 
-  function card(model: Model, stars: number) {
-    return (
-      <div
+  function card(model: Model) {
+    const className = `flex max-w-full items-center rounded-md border px-3 py-2 text-sm hover:bg-accent ${owner ? "cursor-grab active:cursor-grabbing" : ""} ${dragging === model.id ? "opacity-40" : ""}`
+    const dragProps = owner
+      ? {
+          draggable: true,
+          onDragStart: (event: React.DragEvent<HTMLElement>) => {
+            event.dataTransfer.setData("text/plain", model.id)
+            event.dataTransfer.effectAllowed = "move"
+            setDragging(model.id)
+          },
+          onDragEnd: () => {
+            setDragging(null)
+            setOver(null)
+          },
+        }
+      : {}
+
+    return owner ? (
+      <button
         key={model.id}
-        draggable={owner}
-        onDragStart={(event) => {
-          event.dataTransfer.setData("text/plain", model.id)
-          event.dataTransfer.effectAllowed = "move"
-          setDragging(model.id)
-        }}
-        onDragEnd={() => {
-          setDragging(null)
-          setOver(null)
-        }}
-        className={`w-full rounded-lg border p-3 sm:w-56 ${owner ? "cursor-grab active:cursor-grabbing" : ""} ${dragging === model.id ? "opacity-40" : ""}`}
+        type="button"
+        className={className}
+        onClick={() => editRating(model.id)}
+        {...dragProps}
       >
-        <div className="flex items-start gap-2">
-          <Link
-            draggable={false}
-            href={`/models/${encodeURIComponent(model.id)}`}
-            className="min-w-0 flex-1 text-sm break-words hover:underline"
-          >
-            {model.name}
-          </Link>
-          {owner && (
-            <GripVertical className="size-4 shrink-0 text-muted-foreground" />
-          )}
-        </div>
-        {owner && (
-          <div className="mt-3 flex gap-2">
-            <NativeSelect
-              aria-label={`Tier for ${model.name}`}
-              value={stars}
-              onChange={(event) => move(model.id, Number(event.target.value))}
-              className="min-w-0 flex-1"
-              size="sm"
-            >
-              <NativeSelectOption value={0}>Unranked</NativeSelectOption>
-              {tiers.map((tier) => (
-                <NativeSelectOption key={tier.stars} value={tier.stars}>
-                  {tier.letter} · {tier.stars}/5
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-            {stars > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                onClick={() => editRating(model.id)}
-              >
-                Notes
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
+        <ModelLabel model={model} />
+      </button>
+    ) : (
+      <Link
+        key={model.id}
+        href={`/models/${encodeURIComponent(model.id)}`}
+        className={className}
+      >
+        <ModelLabel model={model} />
+      </Link>
     )
   }
 
@@ -381,7 +383,7 @@ function ProfileContent({
               </div>
               <div className="flex flex-wrap content-center gap-2 p-3">
                 {entries.length ? (
-                  entries.map((model) => card(model, tier.stars))
+                  entries.map((model) => card(model))
                 ) : (
                   <p className="self-center text-sm text-muted-foreground">
                     {owner ? "Drop here" : "—"}
@@ -421,7 +423,7 @@ function ProfileContent({
               : `${matches.length} latest models`}
           </p>
           <div className="flex flex-wrap gap-3">
-            {matches.map((model) => card(model, 0))}
+            {matches.map((model) => card(model))}
           </div>
           {!matches.length && (
             <p className="py-8 text-center text-sm text-muted-foreground">
@@ -467,11 +469,10 @@ function ProfileContent({
                         onClick={() => editRating(model.id)}
                         className="h-auto w-full justify-start py-2 text-left"
                       >
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm">
-                            {model.name}
-                          </span>
-                        </span>
+                          <ModelLabel
+                            model={model}
+                            className="min-w-0 flex-1 text-sm"
+                          />
                       </Button>
                     ))}
                     {!editorModels.length && (

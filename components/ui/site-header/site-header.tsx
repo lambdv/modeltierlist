@@ -23,15 +23,23 @@ export function SiteHeader({ models }: { models: HeaderModel[] }) {
           {[
             ["/", "Rankings"],
             ["/models", "Models"],
+            ["/labs", "Labs"],
             ["/my-list", "My list"],
           ].map(([href, label]) => (
             <Link
               key={href}
               href={href}
-              aria-current={pathname === href ? "page" : undefined}
+              aria-current={
+                pathname === href ||
+                (href !== "/" && pathname.startsWith(`${href}/`))
+                  ? "page"
+                  : undefined
+              }
               className={cn(
                 "text-muted-foreground hover:text-foreground",
-                pathname === href && "text-foreground"
+                (pathname === href ||
+                  (href !== "/" && pathname.startsWith(`${href}/`))) &&
+                  "text-foreground"
               )}
             >
               {label}

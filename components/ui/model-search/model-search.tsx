@@ -11,6 +11,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { ProviderIcon } from "@/components/ui/model-ui/model-ui"
+import { modelDisplayName } from "@/lib/models"
 
 type SearchModel = { id: string; name: string; provider: string }
 
@@ -72,10 +74,10 @@ export function ModelSearch({ models }: { models: SearchModel[] }) {
                 }}
                 className="flex items-center justify-between gap-4 rounded-lg px-3 py-2.5 hover:bg-accent focus-visible:bg-accent"
               >
-                <span className="min-w-0 truncate text-sm">{model.name}</span>
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  {model.provider}
+                <span className="min-w-0 truncate text-sm">
+                  {modelDisplayName(model)}
                 </span>
+                <ProviderIcon id={model.id} provider={model.provider} />
               </Link>
             ))
           ) : (

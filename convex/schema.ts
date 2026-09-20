@@ -8,7 +8,9 @@ export default defineSchema({
     stars: v.number(),
     notes: v.optional(v.string()),
     updatedAt: v.number(),
-  }).index("by_user_model", ["userId", "modelId"]),
+  })
+    .index("by_user_model", ["userId", "modelId"])
+    .index("by_updated_at", ["updatedAt"]),
   modelStats: defineTable({
     modelId: v.string(),
     count: v.number(),

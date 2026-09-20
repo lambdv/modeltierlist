@@ -38,6 +38,38 @@ export const community = query({
   handler: async (ctx) => ctx.db.query("modelStats").collect(),
 })
 
+export const seasonalCommunity = query({
+  args: { since: v.optional(v.number()) },
+  handler: async (ctx, { since }) => {
+    const ratings =
+      since === undefined
+        ? await ctx.db.query("ratings").collect()
+        : await ctx.db
+            .query("ratings")
+            .withIndex("by_updated_at", (q) => q.gte("updatedAt", since))
+            .collect()
+    const stats = new Map<
+      string,
+      { modelId: string; count: number; total: number; distribution: number[] }
+    >()
+
+    for (const rating of ratings) {
+      const entry = stats.get(rating.modelId) ?? {
+        modelId: rating.modelId,
+        count: 0,
+        total: 0,
+        distribution: [0, 0, 0, 0, 0],
+      }
+      entry.count++
+      entry.total += rating.stars
+      entry.distribution[rating.stars - 1]++
+      stats.set(rating.modelId, entry)
+    }
+
+    return [...stats.values()]
+  },
+})
+
 export const mine = query({
   args: {},
   handler: async (ctx) => {

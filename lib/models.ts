@@ -11,6 +11,33 @@ export type Model = {
   access: string
   featured: boolean
   createdAt: number
+  category: "general" | "reasoning" | "coding" | "image" | "audio" | "other"
+  lifecycle: "current" | "preview" | "legacy" | "deprecated"
+  variant: "standard" | "batch" | "free" | "alias" | "specialized"
+  canonicalModelId?: string
+  canonical: boolean
+  curated: boolean
+}
+
+export function modelDisplayName(model: Pick<Model, "name" | "provider">) {
+  const prefix = `${model.provider}:`
+  return model.name.toLowerCase().startsWith(prefix.toLowerCase())
+    ? model.name.slice(prefix.length).trimStart()
+    : model.name
+}
+
+export function isLanguageModel(model: Model) {
+  return ["general", "reasoning", "coding"].includes(model.category)
+}
+
+export function isDefaultModel(model: Model) {
+  return (
+    isLanguageModel(model) &&
+    model.variant === "standard" &&
+    model.canonical &&
+    model.curated &&
+    ["current", "preview"].includes(model.lifecycle)
+  )
 }
 
 export const tiers = [
