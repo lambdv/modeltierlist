@@ -76,7 +76,11 @@ export function Catalog({
 
   return (
     <main className={styles.page}>
-      <h1 className="mb-6 text-xl font-semibold">Models</h1>
+      <span className="eyebrow">FIND YOUR NEXT FAVORITE</span>
+      <h1 className="mt-2 mb-3 text-4xl font-normal">The model collection</h1>
+      <p className="mb-8 text-sm text-muted-foreground">
+        A world of intelligence. Find the model that works for you.
+      </p>
 
       <section aria-label="Find models" className={styles.filters}>
         <Input

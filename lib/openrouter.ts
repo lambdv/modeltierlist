@@ -69,6 +69,12 @@ function variantOf(model: OpenRouterModel): Model["variant"] {
   return "standard"
 }
 
+function isGptProVariant(model: OpenRouterModel) {
+  const provider = model.id.split("/")[0].replace(/^~/, "").toLowerCase()
+  const value = `${model.id} ${model.name}`.toLowerCase()
+  return provider === "openai" && /\bgpt\b/.test(value) && /\bpro\b/.test(value)
+}
+
 function categoryOf(model: OpenRouterModel): Model["category"] {
   const value = `${model.id} ${model.name}`.toLowerCase()
   const outputs = model.architecture?.output_modalities ?? []
@@ -180,8 +186,11 @@ export async function getAllModels(): Promise<Model[]> {
   }
 
   const payload = (await response.json()) as OpenRouterModelsResponse
+  const publishedModels = payload.data.filter(
+    (model) => !isGptProVariant(model)
+  )
   const newestByFamily = new Map<string, OpenRouterModel>()
-  for (const model of payload.data) {
+  for (const model of publishedModels) {
     if (variantOf(model) !== "standard") continue
     const key = familyKey(model)
     const current = newestByFamily.get(key)
@@ -190,7 +199,7 @@ export async function getAllModels(): Promise<Model[]> {
   }
 
   const seen = new Set<string>()
-  const models = payload.data.flatMap((raw, index) => {
+  const models = publishedModels.flatMap((raw, index) => {
     const exact = exactModel(raw)
     if (seen.has(exact.id)) return []
     seen.add(exact.id)

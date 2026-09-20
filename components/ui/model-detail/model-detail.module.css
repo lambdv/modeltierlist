@@ -19,21 +19,22 @@
   margin-bottom: 24px;
 }
 .profileHeader h1 {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 36px;
+  font-weight: 400;
   overflow-wrap: anywhere;
 }
 .stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-block: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 24px;
   margin-bottom: 32px;
 }
 .stats > div {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 20px 12px;
+  padding: 24px;
 }
 .statLabel {
   font-size: 12px;
@@ -55,9 +56,9 @@
   gap: 40px;
 }
 .panel {
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  padding: 24px;
+  background: var(--card);
+  border-radius: 24px;
 }
 .panel h2,
 .information h2,
@@ -110,6 +111,11 @@
 }
 .profileContent > section + section {
   margin-top: 32px;
+}
+.profileContent > section {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 24px;
 }
 .description {
   font-size: 14px;

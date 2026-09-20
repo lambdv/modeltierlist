@@ -84,7 +84,11 @@ function ProfileContent({
     const warnBeforeNavigation = (event: MouseEvent) => {
       const link = (event.target as Element | null)?.closest("a[href]")
       if (!link || event.defaultPrevented) return
-      if (!window.confirm("You have unsaved changes. Are you sure you want to leave?")) {
+      if (
+        !window.confirm(
+          "You have unsaved changes. Are you sure you want to leave?"
+        )
+      ) {
         event.preventDefault()
         event.stopPropagation()
       }
@@ -356,7 +360,7 @@ function ProfileContent({
           )}
         </p>
       )}
-      <div className="overflow-hidden rounded-lg border">
+      <div className="tier-board">
         {tiers.map((tier) => {
           const entries = catalog.filter(
             (model) => ratings.get(model.id) === tier.stars
@@ -376,9 +380,11 @@ function ProfileContent({
                 event.preventDefault()
                 if (dragging) move(dragging, tier.stars)
               }}
-              className={`grid min-h-24 grid-cols-[48px_minmax(0,1fr)] border-b last:border-0 sm:grid-cols-[64px_minmax(0,1fr)] ${over === tier.stars ? "bg-accent" : ""}`}
+              data-tier={tier.letter}
+              data-drag-over={over === tier.stars || undefined}
+              className="tier-row"
             >
-              <div className="flex items-center justify-center border-r bg-muted/30">
+              <div className="tier-label">
                 <span className="text-lg font-medium">{tier.letter}</span>
               </div>
               <div className="flex flex-wrap content-center gap-2 p-3">
@@ -469,10 +475,10 @@ function ProfileContent({
                         onClick={() => editRating(model.id)}
                         className="h-auto w-full justify-start py-2 text-left"
                       >
-                          <ModelLabel
-                            model={model}
-                            className="min-w-0 flex-1 text-sm"
-                          />
+                        <ModelLabel
+                          model={model}
+                          className="min-w-0 flex-1 text-sm"
+                        />
                       </Button>
                     ))}
                     {!editorModels.length && (

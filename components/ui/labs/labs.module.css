@@ -1,22 +1,115 @@
-.page { max-width: 1024px; margin: 0 auto; padding: 40px 24px 64px; }
-.intro h1, .labHeader h1 { font-size: 1.25rem; font-weight: 600; }
-.intro p, .labHeader p, .note { margin-top: 6px; color: var(--muted-foreground); font-size: 0.8125rem; }
-.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
-.labCard { display: grid; gap: 18px; padding: 18px; border: 1px solid var(--border); border-radius: var(--radius); }
-.labCard:hover { background: var(--accent); }
-.labName, .labHeader, .back { display: flex; align-items: center; gap: 10px; }
-.labName h2 { font-size: 0.9375rem; font-weight: 500; }
-.labMeta { display: flex; justify-content: space-between; gap: 12px; color: var(--muted-foreground); font-size: 0.75rem; }
-.back { width: fit-content; margin-bottom: 24px; color: var(--muted-foreground); font-size: 0.8125rem; }
-.back:hover { color: var(--foreground); }
-.labHeader { margin-bottom: 28px; }
-.labHeader > span { font-size: 2rem; }
-.tableWrap { overflow-x: auto; border-top: 1px solid var(--border); }
-.table { width: 100%; min-width: 650px; border-collapse: collapse; text-align: left; }
-.table th { padding: 11px 12px; color: var(--muted-foreground); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
-.table td { padding: 14px 12px; border-top: 1px solid var(--border); font-size: 0.8125rem; }
-.table td:not(:first-child) { color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
-.table tbody tr:hover { background: var(--accent); }
-.table a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.note { margin-top: 14px; }
-@media (max-width: 600px) { .page { padding: 32px 16px 48px; } .grid { grid-template-columns: 1fr; } }
+.page {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+.intro h1,
+.labHeader h1 {
+  font-size: 2.25rem;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+.intro p,
+.labHeader p,
+.note {
+  margin-top: 6px;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+}
+.labCard {
+  display: grid;
+  gap: 32px;
+  padding: 28px;
+  background: var(--card);
+  border-radius: 24px;
+  transition: background 0.2s;
+}
+.labCard:hover {
+  background: var(--accent);
+}
+.labName,
+.labHeader,
+.back {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.labName h2 {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.labMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+.back {
+  width: fit-content;
+  margin-bottom: 24px;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+.back:hover {
+  color: var(--foreground);
+}
+.labHeader {
+  margin-bottom: 28px;
+}
+.labHeader > span {
+  font-size: 2rem;
+}
+.tableWrap {
+  overflow-x: auto;
+  background: var(--card);
+  border-radius: 24px;
+  padding: 12px;
+}
+.table {
+  width: 100%;
+  min-width: 650px;
+  border-collapse: collapse;
+  text-align: left;
+}
+.table th {
+  padding: 11px 12px;
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.table td {
+  padding: 14px 12px;
+  border-top: 1px solid var(--border);
+  font-size: 0.8125rem;
+}
+.table td:not(:first-child) {
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+.table tbody tr:hover {
+  background: var(--accent);
+}
+.table a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.note {
+  margin-top: 14px;
+}
+@media (max-width: 600px) {
+  .page {
+    padding: 32px 16px 48px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
