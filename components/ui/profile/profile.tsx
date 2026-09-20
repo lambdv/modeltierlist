@@ -261,72 +261,84 @@ function ProfileContent({
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <section>
-        <div>
-          <div className="mb-3 flex items-center justify-between gap-4">
-            {profile.user.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profile.user.image}
-                alt={`${profile.user.name}'s avatar`}
-                referrerPolicy="no-referrer"
-                className="size-10 rounded-full object-cover"
-              />
-            ) : (
-              <div className="flex size-10 items-center justify-center rounded-full bg-muted text-sm font-medium">
-                {profile.user.name.slice(0, 1).toUpperCase()}
-              </div>
-            )}
-            <Button
-              variant="outline"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(
-                    `${window.location.origin}/user/${encodeURIComponent(userId)}`
-                  )
-                  setCopied(true)
-                  setShareError("")
-                } catch {
-                  setShareError(
-                    "Couldn't copy the link. Copy the profile URL from your address bar."
-                  )
-                }
-              }}
-            >
-              {copied ? (
-                <Check className="size-4" />
+      {!owner && (
+        <section>
+          <div>
+            <div className="mb-3 flex items-center justify-between gap-4">
+              {profile.user.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profile.user.image}
+                  alt={`${profile.user.name}'s avatar`}
+                  referrerPolicy="no-referrer"
+                  className="size-10 rounded-full object-cover"
+                />
               ) : (
-                <Share2 className="size-4" />
+                <div className="flex size-10 items-center justify-center rounded-full bg-muted text-sm font-medium">
+                  {profile.user.name.slice(0, 1).toUpperCase()}
+                </div>
               )}
-              {copied ? "Copied" : "Share"}
-            </Button>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      `${window.location.origin}/user/${encodeURIComponent(userId)}`
+                    )
+                    setCopied(true)
+                    setShareError("")
+                  } catch {
+                    setShareError(
+                      "Couldn't copy the link. Copy the profile URL from your address bar."
+                    )
+                  }
+                }}
+              >
+                {copied ? (
+                  <Check className="size-4" />
+                ) : (
+                  <Share2 className="size-4" />
+                )}
+                {copied ? "Copied" : "Share"}
+              </Button>
+            </div>
+            <h1 className="text-xl font-semibold break-words">
+              {profile.user.name}
+            </h1>
+            {shareError && (
+              <p role="alert" className="mt-3 text-sm text-destructive">
+                {shareError}
+              </p>
+            )}
+            <div className="mt-2 text-sm text-muted-foreground">
+              <span>{ratings.size} models ranked</span>
+            </div>
           </div>
-          <h1 className="text-xl font-semibold break-words">
-            {profile.user.name}
-          </h1>
-          {shareError && (
-            <p role="alert" className="mt-3 text-sm text-destructive">
-              {shareError}
-            </p>
-          )}
-          <div className="mt-2 text-sm text-muted-foreground">
-            <span>{ratings.size} models ranked</span>
-          </div>
-        </div>
-      </section>
-      <div className="mt-8 mb-4 flex flex-wrap items-center justify-between gap-3">
+        </section>
+      )}
+      <div
+        className={
+          owner
+            ? "ranking-header ranking-title-row flex-wrap"
+            : "mt-8 mb-4 flex flex-wrap items-center justify-between gap-3"
+        }
+      >
         <div>
-          <h2 className="text-sm font-medium">Tier list</h2>
+          {owner ? (
+            <h1>Your list</h1>
+          ) : (
+            <h2 className="text-sm font-medium">Your list</h2>
+          )}
         </div>
         {owner ? (
           <div className="flex flex-wrap items-center justify-end gap-3">
-            <span role="status" className="text-xs text-muted-foreground">
-              {saving
-                ? "Saving changes…"
-                : dirty
-                  ? `${Object.keys(pending).length} unsaved change${Object.keys(pending).length === 1 ? "" : "s"}`
-                  : "Saved"}
-            </span>
+            {(saving || dirty) && (
+              <span role="status" className="text-xs text-muted-foreground">
+                {saving
+                  ? "Saving changes…"
+                  : `${Object.keys(pending).length} unsaved change${Object.keys(pending).length === 1 ? "" : "s"}`}
+              </span>
+            )}
             <Button
               variant="outline"
               type="button"

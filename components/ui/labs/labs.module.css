@@ -1,15 +1,13 @@
 .page {
   max-width: 1024px;
   margin: 0 auto;
-  padding: 40px 24px 64px;
+  padding: 32px 24px 64px;
 }
-.intro h1,
 .labHeader h1 {
   font-size: 2.25rem;
   font-weight: 400;
   letter-spacing: -1px;
 }
-.intro p,
 .labHeader p,
 .note {
   margin-top: 6px;
@@ -20,7 +18,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  margin-top: 28px;
+  margin-top: 16px;
 }
 .labCard {
   display: grid;
@@ -45,11 +43,17 @@
   font-weight: 500;
 }
 .labMeta {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
   color: var(--muted-foreground);
   font-size: 0.75rem;
+}
+.search {
+  margin-bottom: 0;
+}
+.empty {
+  padding: 48px 0;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
 }
 .back {
   width: fit-content;

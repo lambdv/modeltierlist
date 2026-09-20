@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Bookmark, Boxes, FlaskConical, Trophy } from "lucide-react"
-import { useEffect, useState } from "react"
 import LatticeLoader from "@/components/LatticeLoader"
 import { AuthButton } from "@/components/ui/auth-button/auth-button"
 import { ModelSearch } from "@/components/ui/model-search/model-search"
@@ -19,22 +18,13 @@ const destinations = [
 
 export function SiteHeader({ models }: { models: HeaderModel[] }) {
   const pathname = usePathname()
-  const [isScrolled, setIsScrolled] = useState(false)
-
-  useEffect(() => {
-    const updateHeader = () => setIsScrolled(window.scrollY > 16)
-
-    updateHeader()
-    window.addEventListener("scroll", updateHeader, { passive: true })
-    return () => window.removeEventListener("scroll", updateHeader)
-  }, [])
 
   return (
     <>
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
-      <header className="app-header" data-scrolled={isScrolled || undefined}>
+      <header className="app-header">
         <div className="app-bar">
           <Link href="/" className="brand" aria-label="Model Tier List home">
             <LatticeLoader

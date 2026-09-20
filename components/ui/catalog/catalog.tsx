@@ -8,79 +8,58 @@ import { api } from "@/convex/_generated/api"
 import { isDefaultModel, isLanguageModel, type Model } from "@/lib/models"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { getRankings } from "@/lib/model-rankings"
 import { ModelLabel } from "@/components/ui/model-ui/model-ui"
 import styles from "./catalog.module.css"
 
 export function Catalog({
   models,
-  initialProvider = "",
 }: {
   models: Model[]
   initialProvider?: string
 }) {
   const stats = useQuery(api.ratings.community)
   const [search, setSearch] = useState("")
-  const [provider, setProvider] = useState(initialProvider)
-  const [capability, setCapability] = useState("")
-  const [sort, setSort] = useState("rank")
-  const [scope, setScope] = useState("current")
+  // Provider, capability, sorting, and scope controls are intentionally
+  // disabled while the catalog uses a search-only browsing experience.
   const rankings = getRankings(
     models.map((model) => model.id),
     stats
   )
   const scopedModels = models.filter((model) => {
     if (!isLanguageModel(model) || model.variant !== "standard") return false
-    if (scope === "versions") return true
     if (!model.canonical) return false
-    return scope === "legacy" || isDefaultModel(model)
+    return isDefaultModel(model)
   })
-  const providers = [
-    ...new Set(scopedModels.map((model) => model.provider)),
-  ].sort()
-  const capabilities = [
-    ...new Set(scopedModels.flatMap((model) => model.tags)),
-  ].sort()
   const query = search.trim().toLowerCase()
   const entries = scopedModels
     .filter(
       (model) =>
-        (!query ||
-          `${model.name} ${model.id} ${model.provider} ${model.tags.join(" ")}`
-            .toLowerCase()
-            .includes(query)) &&
-        (!provider || model.provider === provider) &&
-        (!capability || model.tags.includes(capability))
+        !query ||
+        `${model.name} ${model.id} ${model.provider} ${model.tags.join(" ")}`
+          .toLowerCase()
+          .includes(query)
     )
     .sort((a, b) => {
-      if (sort === "name") return a.name.localeCompare(b.name)
-      if (sort === "newest")
-        return b.createdAt - a.createdAt || a.name.localeCompare(b.name)
-      const ranks = sort === "popular" ? rankings.popularity : rankings.overall
       return (
-        (ranks.get(a.id) ?? Infinity) - (ranks.get(b.id) ?? Infinity) ||
+        (rankings.overall.get(a.id) ?? Infinity) -
+          (rankings.overall.get(b.id) ?? Infinity) ||
         a.name.localeCompare(b.name)
       )
     })
-  const filtered = Boolean(
-    search || provider || capability || scope !== "current"
-  )
+  const filtered = Boolean(search)
 
   function clearFilters() {
     setSearch("")
-    setProvider("")
-    setCapability("")
-    setScope("current")
   }
 
   return (
     <main className={styles.page}>
-      <span className="eyebrow">FIND YOUR NEXT FAVORITE</span>
-      <h1 className="mt-2 mb-3 text-4xl font-normal">The model collection</h1>
-      <p className="mb-8 text-sm text-muted-foreground">
-        A world of intelligence. Find the model that works for you.
-      </p>
+      <header className="ranking-header">
+        <div className="ranking-title-row">
+          <h1>Models</h1>
+        </div>
+      </header>
 
       <section aria-label="Find models" className={styles.filters}>
         <Input
@@ -90,65 +69,7 @@ export function Catalog({
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
-        <div className={styles.filterRow}>
-          <label>
-            Provider
-            <NativeSelect
-              value={provider}
-              onChange={(event) => setProvider(event.target.value)}
-            >
-              <NativeSelectOption value="">All providers</NativeSelectOption>
-              {providers.map((name) => (
-                <NativeSelectOption key={name}>{name}</NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </label>
-          <label>
-            Capability
-            <NativeSelect
-              value={capability}
-              onChange={(event) => setCapability(event.target.value)}
-            >
-              <NativeSelectOption value="">All capabilities</NativeSelectOption>
-              {capabilities.map((name) => (
-                <NativeSelectOption key={name}>{name}</NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </label>
-          <label className={styles.sort}>
-            Sort by
-            <NativeSelect
-              value={sort}
-              onChange={(event) => setSort(event.target.value)}
-            >
-              <NativeSelectOption value="rank">Overall rank</NativeSelectOption>
-              <NativeSelectOption value="popular">
-                Most popular
-              </NativeSelectOption>
-              <NativeSelectOption value="newest">
-                Newest first
-              </NativeSelectOption>
-              <NativeSelectOption value="name">Name A–Z</NativeSelectOption>
-            </NativeSelect>
-          </label>
-          <label>
-            Scope
-            <NativeSelect
-              value={scope}
-              onChange={(event) => setScope(event.target.value)}
-            >
-              <NativeSelectOption value="current">
-                Current models
-              </NativeSelectOption>
-              <NativeSelectOption value="legacy">
-                Include legacy
-              </NativeSelectOption>
-              <NativeSelectOption value="versions">
-                All LLM versions
-              </NativeSelectOption>
-            </NativeSelect>
-          </label>
-        </div>
+        {/* Additional filters are intentionally disabled for now. */}
       </section>
 
       <div className={styles.resultsHeading}>
