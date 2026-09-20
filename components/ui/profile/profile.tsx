@@ -140,7 +140,7 @@ function ProfileContent({
       catalog.push({
         id,
         name: id.split("/").pop() ?? id,
-        provider: id.split("/")[0],
+        provider: id.split("/")[0].replace(/^~/, ""),
         symbol: "◈",
         createdAt: 0,
       } as Model)
@@ -212,7 +212,7 @@ function ProfileContent({
         <div className="flex items-start gap-2">
           <Link
             draggable={false}
-            href={`/model/${model.id}`}
+            href={`/models/${encodeURIComponent(model.id)}`}
             className="min-w-0 flex-1 text-sm break-words hover:underline"
           >
             {model.name}

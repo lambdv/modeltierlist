@@ -89,8 +89,15 @@ export const rate = mutation({
       total: (stats?.total ?? 0) + (stars ?? 0) - (previous?.stars ?? 0),
       distribution,
     }
-    if (stats) await ctx.db.patch(stats._id, next)
-    else if (stars !== null) await ctx.db.insert("modelStats", next)
+    if (stats && (next.count > 0 || stars !== null)) {
+      await ctx.db.patch(stats._id, next)
+    } else if (stats) {
+      // Last rating removed: drop the stats row instead of leaving a
+      // zero-count zombie behind (same as clearUserRatings).
+      await ctx.db.delete(stats._id)
+    } else if (stars !== null) {
+      await ctx.db.insert("modelStats", next)
+    }
     if (stars === null) {
       if (previous) await ctx.db.delete(previous._id)
     } else if (previous) {

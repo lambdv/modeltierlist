@@ -19,7 +19,7 @@ export function AuthButton() {
         ? await authClient.signOut()
         : await authClient.signIn.social({
             provider: "github",
-            callbackURL: window.location.href,
+            callbackURL: "/",
           })
       if (result.error)
         setError(result.error.message ?? "Sign-in failed. Please try again.")

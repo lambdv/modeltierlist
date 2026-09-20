@@ -25,7 +25,8 @@ const providerNames: Record<string, string> = {
 }
 
 function formatProvider(id: string) {
-  const provider = id.split("/")[0]
+  // OpenRouter also publishes alias providers prefixed with "~".
+  const provider = id.split("/")[0].replace(/^~/, "")
   return (
     providerNames[provider] ??
     provider
@@ -35,11 +36,17 @@ function formatProvider(id: string) {
   )
 }
 
-function exactModel(model: OpenRouterModel): OpenRouterModel | null {
+function exactModel(model: OpenRouterModel): OpenRouterModel {
   if (!/latest/i.test(model.id) && !/latest/i.test(model.name)) return model
 
   const canonicalId = model.canonical_slug
-  if (!canonicalId || /latest$/i.test(canonicalId)) return null
+  // Alias pointers (e.g. "~provider/model-latest") whose canonical slug is
+  // still a "latest" pointer have no pinned version to resolve to. They are
+  // real, routable models that users can rate, so keep them as published
+  // instead of dropping them (dropping orphans existing ratings: the model
+  // disappears from the catalog, leaderboards, and its detail page 404s,
+  // leaving the rating visible only as an unremovable ghost entry).
+  if (!canonicalId || /latest$/i.test(canonicalId)) return model
 
   const version = canonicalId.slice(model.id.length).replace(/^-/, "")
   const formattedVersion = /^\d{8}$/.test(version)
@@ -95,8 +102,5 @@ export async function getModels(): Promise<Model[]> {
   }
 
   const payload = (await response.json()) as OpenRouterModelsResponse
-  return payload.data
-    .map(exactModel)
-    .filter((model): model is OpenRouterModel => model !== null)
-    .map(toModel)
+  return payload.data.map(exactModel).map(toModel)
 }
