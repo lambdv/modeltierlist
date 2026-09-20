@@ -5,6 +5,7 @@ import Link from "next/link"
 import { type Lab } from "@/lib/labs"
 import { Input } from "@/components/ui/input"
 import { ProviderIcon } from "@/components/ui/model-ui/model-ui"
+import { BorderGlow } from "@/components/ui/border-glow/border-glow"
 import styles from "./labs.module.css"
 
 export function Labs({ labs }: { labs: Lab[] }) {
@@ -36,15 +37,17 @@ export function Labs({ labs }: { labs: Lab[] }) {
           <Link
             key={lab.id}
             href={`/labs/${lab.id}`}
-            className={styles.labCard}
+            className={styles.labCardLink}
           >
-            <div className={styles.labName}>
-              <ProviderIcon id={`${lab.id}/model`} provider={lab.name} />
-              <h2>{lab.name}</h2>
-            </div>
-            <div className={styles.labMeta}>
-              <span>{lab.models.length} models</span>
-            </div>
+            <BorderGlow contentClassName={styles.labCard}>
+              <div className={styles.labName}>
+                <ProviderIcon id={`${lab.id}/model`} provider={lab.name} />
+                <h2>{lab.name}</h2>
+              </div>
+              <div className={styles.labMeta}>
+                <span>{lab.models.length} models</span>
+              </div>
+            </BorderGlow>
           </Link>
         ))}
       </section>

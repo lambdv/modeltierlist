@@ -17,4 +17,9 @@ export default defineSchema({
     total: v.number(),
     distribution: v.array(v.number()),
   }).index("by_model", ["modelId"]),
+  ratingRateLimits: defineTable({
+    userId: v.string(),
+    windowStartedAt: v.number(),
+    count: v.number(),
+  }).index("by_user", ["userId"]),
 })

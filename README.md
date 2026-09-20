@@ -39,6 +39,15 @@ The production GitHub OAuth callback must use the deployed app origin:
 https://modeltierlist.vercel.app/api/auth/callback/github
 ```
 
-Set `SITE_URL` on whichever Convex deployment the Vercel app uses. Normally
-that should be the production deployment; this project currently points Vercel
-at the development deployment, so that deployment needs the production URL too.
+Production must use a dedicated production Convex deployment. Deploy it and set
+the production-scoped Vercel variables from its output:
+
+```bash
+bunx convex deploy
+```
+
+Never copy a `dev:` `CONVEX_DEPLOYMENT` value into Vercel Production. The Next.js
+configuration intentionally rejects that combination at build time. Set
+`SITE_URL`, `BETTER_AUTH_SECRET`, `GITHUB_CLIENT_ID`, and `GITHUB_CLIENT_SECRET`
+on the production Convex deployment, and use a separate production OAuth app (or
+an explicitly configured production callback URL).

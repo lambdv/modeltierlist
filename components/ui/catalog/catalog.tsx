@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { getRankings } from "@/lib/model-rankings"
 import { ModelLabel } from "@/components/ui/model-ui/model-ui"
+import { BorderGlow } from "@/components/ui/border-glow/border-glow"
 import styles from "./catalog.module.css"
 
 export function Catalog({
@@ -97,17 +98,19 @@ export function Catalog({
             <Link
               key={model.id}
               href={`/models/${encodeURIComponent(model.id)}`}
-              className={styles.card}
+              className={styles.cardLink}
             >
-              <h2 className="min-w-0 truncate text-sm font-medium">
-                <ModelLabel model={model} />
-              </h2>
-              <span
-                className="shrink-0 text-xs text-muted-foreground tabular-nums"
-                aria-label={rank ? `Rank ${rank}` : "Unranked"}
-              >
-                {stats === undefined ? "…" : rank ? `#${rank}` : "—"}
-              </span>
+              <BorderGlow contentClassName={styles.card}>
+                <h2 className="min-w-0 truncate text-sm font-medium">
+                  <ModelLabel model={model} />
+                </h2>
+                <span
+                  className="shrink-0 text-xs text-muted-foreground tabular-nums"
+                  aria-label={rank ? `Rank ${rank}` : "Unranked"}
+                >
+                  {stats === undefined ? "…" : rank ? `#${rank}` : "—"}
+                </span>
+              </BorderGlow>
             </Link>
           )
         })}

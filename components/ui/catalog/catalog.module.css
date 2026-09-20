@@ -40,17 +40,20 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
+.cardLink {
+  min-width: 0;
+  border-radius: 20px;
+}
 .card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
   padding: 24px 20px;
-  border-radius: 20px;
-  background: var(--card);
+  border-radius: inherit;
   transition: background 0.2s;
 }
-.card:hover {
+.cardLink:hover .card {
   background: var(--accent);
 }
 .loading {
