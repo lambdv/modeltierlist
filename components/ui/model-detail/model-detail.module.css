@@ -1,0 +1,178 @@
+.page {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+.back:hover,
+.listLink:hover {
+  color: var(--foreground);
+}
+.profileHeader {
+  margin-bottom: 24px;
+}
+.profileHeader h1 {
+  font-size: 24px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-block: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+.stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 12px;
+}
+.statLabel {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.stats strong {
+  font-size: 22px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.stats small {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+.profileBody {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 40px;
+}
+.panel {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.panel h2,
+.information h2,
+.sectionHeading {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+.muted,
+.feedback {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.feedback:not(:empty) {
+  margin-top: 12px;
+}
+.signIn p {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.listLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+  padding-top: 12px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.information {
+  padding: 24px 0;
+}
+.information dl {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 12px;
+  font-size: 12px;
+}
+.information dt {
+  color: var(--muted-foreground);
+}
+.information dd {
+  overflow-wrap: anywhere;
+}
+.profileContent {
+  min-width: 0;
+}
+.profileContent > section + section {
+  margin-top: 32px;
+}
+.description {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+.breakdownHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.breakdownHeading > span {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.distribution {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.distributionRow {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 30px;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.distributionRow > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.distributionRow > span:last-child {
+  text-align: right;
+}
+.track {
+  height: 6px;
+  background: var(--muted);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.track > div {
+  height: 100%;
+  background: var(--primary);
+}
+@media (max-width: 600px) {
+  .page {
+    padding: 32px 16px 48px;
+  }
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .profileBody {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

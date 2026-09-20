@@ -10,6 +10,7 @@ export type Model = {
   status: string
   access: string
   featured: boolean
+  createdAt: number
 }
 
 export const tiers = [

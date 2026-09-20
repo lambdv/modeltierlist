@@ -3,12 +3,14 @@ import { type Model } from "@/lib/models"
 
 type OpenRouterModel = {
   id: string
+  canonical_slug?: string
   name: string
   description?: string
   context_length?: number | null
   hugging_face_id?: string | null
   architecture?: { input_modalities?: string[] }
   supported_parameters?: string[]
+  created?: number
 }
 
 type OpenRouterModelsResponse = { data: OpenRouterModel[] }
@@ -31,6 +33,24 @@ function formatProvider(id: string) {
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join(" ")
   )
+}
+
+function exactModel(model: OpenRouterModel): OpenRouterModel | null {
+  if (!/latest/i.test(model.id) && !/latest/i.test(model.name)) return model
+
+  const canonicalId = model.canonical_slug
+  if (!canonicalId || /latest$/i.test(canonicalId)) return null
+
+  const version = canonicalId.slice(model.id.length).replace(/^-/, "")
+  const formattedVersion = /^\d{8}$/.test(version)
+    ? `${version.slice(0, 4)}-${version.slice(4, 6)}-${version.slice(6)}`
+    : version
+
+  return {
+    ...model,
+    id: canonicalId,
+    name: model.name.replace(/\s+Latest\b/i, ` ${formattedVersion}`),
+  }
 }
 
 function toModel(model: OpenRouterModel, index: number): Model {
@@ -56,6 +76,7 @@ function toModel(model: OpenRouterModel, index: number): Model {
       : "Available on OpenRouter",
     access: model.hugging_face_id ? "Open weights" : "Proprietary",
     featured: index < 4,
+    createdAt: model.created ?? 0,
   }
 }
 
@@ -74,5 +95,8 @@ export async function getModels(): Promise<Model[]> {
   }
 
   const payload = (await response.json()) as OpenRouterModelsResponse
-  return payload.data.map(toModel)
+  return payload.data
+    .map(exactModel)
+    .filter((model): model is OpenRouterModel => model !== null)
+    .map(toModel)
 }

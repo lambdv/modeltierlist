@@ -6,6 +6,7 @@ export default defineSchema({
     userId: v.string(),
     modelId: v.string(),
     stars: v.number(),
+    notes: v.optional(v.string()),
     updatedAt: v.number(),
   }).index("by_user_model", ["userId", "modelId"]),
   modelStats: defineTable({

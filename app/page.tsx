@@ -1,7 +1,7 @@
-import { Catalog } from "@/components/catalog"
+import { LandingTierList } from "@/components/ui/landing-tier-list/landing-tier-list"
 import { getModels } from "@/lib/openrouter"
 
 export default async function Page() {
   const models = await getModels()
-  return <Catalog models={models} />
+  return <LandingTierList models={models} />
 }
