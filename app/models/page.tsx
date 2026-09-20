@@ -16,6 +16,8 @@ export default async function ModelsPage({
   return (
     <Catalog
       key={initialProvider}
+
+      
       models={models}
       initialProvider={initialProvider}
     />
