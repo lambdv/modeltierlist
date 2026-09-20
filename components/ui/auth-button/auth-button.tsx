@@ -13,7 +13,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
-export function AuthButton() {
+export function AuthButton({
+  signedOutLabel = "Sign in",
+  variant = "outline",
+}: {
+  signedOutLabel?: string
+  variant?: "default" | "outline"
+}) {
   const { data: session, isPending } = authClient.useSession()
   const [loginOpen, setLoginOpen] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -74,7 +80,7 @@ export function AuthButton() {
         </Link>
       )}
       <Button
-        variant="outline"
+        variant={variant}
         onClick={session ? signOut : () => setLoginOpen(true)}
         disabled={busy || isPending}
       >
@@ -85,7 +91,7 @@ export function AuthButton() {
         ) : (
           <LogIn />
         )}
-        {busy || isPending ? "Loading…" : session ? "Sign out" : "Sign in"}
+        {busy || isPending ? "Loading…" : session ? "Sign out" : signedOutLabel}
       </Button>
       {session && error && (
         <p

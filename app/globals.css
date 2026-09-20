@@ -321,6 +321,96 @@ select {
 .tonal-link:hover {
   filter: brightness(1.1);
 }
+.contribute-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-bottom: 36px;
+  padding: 52px 28px 44px;
+  border-radius: 32px;
+  background: #f8df83;
+  color: #352b10;
+  text-align: center;
+}
+.contribute-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.contribute-content h2 {
+  max-width: 680px;
+  font-size: clamp(32px, 4.5vw, 56px);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -1.8px;
+  text-wrap: balance;
+}
+.contribute-login {
+  margin-top: 32px;
+}
+.contribute-card .contribute-login .md-button[data-variant="filled"] {
+  --md-sys-color-primary: #fff;
+  --md-sys-color-on-primary: #111;
+  min-height: 48px;
+  height: auto;
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  white-space: normal;
+  box-shadow: none;
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+.contribute-card .contribute-login .md-button[data-variant="filled"]:hover {
+  background: #f0f0f0;
+  color: #111;
+  box-shadow: 0 2px 6px #352b1026;
+}
+.contribute-card .contribute-login .md-button[data-variant="filled"]:active {
+  background: #e5e5e5;
+  box-shadow: none;
+}
+.contribute-login button:focus-visible {
+  outline-color: #352b10;
+}
+.contribute-flowers {
+  position: absolute;
+  right: -24px;
+  bottom: -32px;
+  width: clamp(160px, 23vw, 280px);
+  pointer-events: none;
+}
+.contribute-flowers > g {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: contribute-flower-sway 6s ease-in-out infinite alternate;
+}
+.contribute-flowers > g:nth-of-type(2) {
+  animation-duration: 7s;
+  animation-delay: -3s;
+}
+.contribute-flowers > g:nth-of-type(3) {
+  animation-duration: 5s;
+  animation-delay: -2s;
+}
+@keyframes contribute-flower-sway {
+  from { rotate: -9deg; }
+  to { rotate: 9deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contribute-flowers > g {
+    animation: none;
+  }
+}
+@media (max-width: 640px) {
+  .contribute-card {
+    padding: 36px 20px 112px;
+    border-radius: 24px;
+  }
+}
 .ranking-header {
   margin-bottom: 24px;
 }
