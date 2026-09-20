@@ -1,29 +1,32 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google"
-
+import type { Metadata } from "next"
+import { SiteHeader } from "@/components/site-header"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
+import { getToken } from "@/lib/auth-server"
+import { ConvexClientProvider } from "@/components/providers/ConvexClientProvider"
+import { getModels } from "@/lib/openrouter"
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'})
+export const metadata: Metadata = {
+  title: "Modelist — Find your next coding model",
+  description:
+    "Discover, rate, and rank coding models. Your experience, the community's perspective.",
+}
 
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-})
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const [token, models] = await Promise.all([getToken(), getModels()])
+
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)}
-    >
+    <html lang="en">
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ConvexClientProvider initialToken={token}>
+          <SiteHeader modelCount={models.length} />
+          {children}
+          <hr />
+          <footer>Modelist — Built for builders.</footer>
+        </ConvexClientProvider>
       </body>
     </html>
   )
